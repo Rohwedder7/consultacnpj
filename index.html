@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consulta Publica de CNPJ</title>
+<style>
+  :root {
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --border: #e5e7eb;
+    --success: #059669;
+    --warning: #d97706;
+    --error: #dc2626;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(180deg, #eef3ff 0%, var(--bg) 35%, var(--bg) 100%);
+    color: var(--text);
+  }
+
+  .app {
+    width: 100%;
+    max-width: 1600px;
+    padding: 0 12px;
+    margin: 12px auto 24px;
+    display: grid;
+    gap: 16px;
+  }
+
+  .app,
+  .hero,
+  .card,
+  .controls-grid,
+  .input-group,
+  .meta,
+  .result-shell {
+    min-width: 0;
+  }
+
+  .hero {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.08);
+  }
+
+  .hero h1 {
+    margin: 0 0 8px;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    letter-spacing: 0.2px;
+  }
+
+  .hero p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.96rem;
+  }
+
+  .controls-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+  }
+
+  .card.half {
+    min-width: 0;
+  }
+
+  @media (min-width: 1280px) {
+    .controls-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  h2 {
+    margin: 0 0 12px;
+    font-size: 1.05rem;
+  }
+
+  .input-group {
+    display: grid;
+    gap: 10px;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #111827;
+  }
+
+  input[type="text"], input[type="file"] {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 12px;
+    background: #fff;
+    color: var(--text);
+    font-size: 0.94rem;
+  }
+
+  .btn-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 4px;
+    width: 100%;
+  }
+
+  .btn-row > * { min-width: 0; max-width: 100%; }
+  .btn-row > :only-child { grid-column: 1 / -1; }
+
+  button {
+    width: 100%;
+    min-height: 42px;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+  .btn-neutral { background: #e5e7eb; color: #111827; }
+  .btn-neutral:hover:not(:disabled) { background: #d1d5db; }
+  .btn-danger { background: #fee2e2; color: #991b1b; }
+  .btn-danger:hover:not(:disabled) { background: #fecaca; }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .pill {
+    display: block;
+    background: #f9fafb;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    color: #374151;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .file-picker {
+    width: 100%;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 8px;
+    align-items: center;
+  }
+
+  .file-native {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .file-name {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: #fff;
+    font-size: 0.9rem;
+    color: #4b5563;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .status {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #1f2937;
+    min-height: 20px;
+  }
+
+  .progress-wrap {
+    margin-top: 10px;
+    width: 100%;
+    background: #e5e7eb;
+    border-radius: 999px;
+    height: 10px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #60a5fa, #2563eb);
+    transition: width 0.4s ease;
+  }
+
+  .result-shell {
+    display: grid;
+    gap: 14px;
+  }
+
+  .result-top {
+    border: 1px solid #dbeafe;
+    background: linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
+    border-radius: 12px;
+    padding: 14px;
+    display: grid;
+    gap: 8px;
+  }
+
+  .result-top h3 {
+    margin: 0;
+    font-size: 1.03rem;
+  }
+
+  .result-top p {
+    margin: 0;
+    color: #334155;
+    font-size: 0.92rem;
+    overflow-wrap: anywhere;
+  }
+
+  .result-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .badge {
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    border: 1px solid transparent;
+  }
+
+  .badge.ok {
+    color: #065f46;
+    background: #d1fae5;
+    border-color: #a7f3d0;
+  }
+
+  .badge.err {
+    color: #991b1b;
+    background: #fee2e2;
+    border-color: #fecaca;
+  }
+
+  .result-section {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    background: #ffffff;
+  }
+
+  .result-section h4 {
+    margin: 0 0 10px;
+    font-size: 0.95rem;
+    color: #0f172a;
+  }
+
+  .result-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  }
+
+  .field {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    background: #f8fafc;
+  }
+
+  .field strong {
+    display: block;
+    font-size: 0.76rem;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+
+  .ok { color: var(--success); font-weight: 600; }
+  .warn { color: var(--warning); font-weight: 600; }
+  .err { color: var(--error); font-weight: 600; }
+
+  @media (max-width: 760px) {
+    body {
+      font-size: 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 100%;
+      padding: 0 6px;
+      gap: 12px;
+      margin: 6px auto 14px;
+    }
+
+    .hero,
+    .card {
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .controls-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .btn-row {
+      grid-template-columns: 1fr;
+    }
+
+    button {
+      width: 100%;
+    }
+
+    .meta {
+      grid-template-columns: 1fr;
+    }
+
+    .pill {
+      width: 100%;
+      text-align: center;
+    }
+
+    .file-picker {
+      grid-template-columns: 1fr;
+    }
+
+    .result-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <section class="hero">
+    <h1>Consulta Publica de CNPJ em Lote</h1>
+    <p>Importe um arquivo Excel com CNPJs, consulte as APIs em 3 requisicoes por minuto e exporte o resultado em XLSX com os mesmos campos do cadastro.</p>
+  </section>
+
+  <section class="controls-grid">
+    <article class="card half">
+      <h2>Consulta individual</h2>
+      <div class="input-group">
+        <label for="cnpjManual">CNPJ</label>
+        <input id="cnpjManual" type="text" placeholder="00.000.000/0000-00" maxlength="18">
+      </div>
+      <div class="btn-row">
+        <button id="btnConsultarManual" class="btn-primary" type="button">Consultar CNPJ</button>
+      </div>
+      <div id="statusManual" class="status"></div>
+    </article>
+
+    <article class="card half">
+      <h2>Processamento em lote (Excel)</h2>
+      <div class="input-group">
+        <label for="arquivoExcel">Arquivo (xlsx, xls ou csv)</label>
+        <div class="file-picker">
+          <input id="arquivoExcel" class="file-native" type="file" accept=".xlsx,.xls,.csv">
+          <button id="btnEscolherArquivo" class="btn-neutral" type="button">Escolher arquivo</button>
+          <div id="nomeArquivo" class="file-name">Nenhum arquivo selecionado</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button id="btnIniciarLote" class="btn-primary" type="button" disabled>Iniciar lote</button>
+        <button id="btnPararLote" class="btn-danger" type="button" disabled>Parar</button>
+        <button id="btnExportar" class="btn-neutral" type="button" disabled>Exportar XLSX</button>
+      </div>
+      <div class="meta">
+        <span class="pill" id="pillIntervalo">Intervalo entre CNPJs: 20s (3 por minuto)</span>
+        <span class="pill" id="pillQuantidade">CNPJs carregados: 0</span>
+      </div>
+      <div id="statusLote" class="status"></div>
+      <div class="progress-wrap">
+        <div id="barraProgresso" class="progress-bar"></div>
+      </div>
+    </article>
+  </section>
+
+  <section class="card">
+    <h2>Resultado da consulta individual</h2>
+    <div id="resultadoManual" class="result-shell"></div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+  const INTERVALO_CONSULTA_MS = 20000;
+  const COLUNAS = [
+    "STATUS",
+    "ERRO",
+    "CNPJ",
+    "RAZAO SOCIAL",
+    "NOME FANTASIA",
+    "MATRIZ / FILIAL",
+    "NATUREZA JURIDICA",
+    "CNAE PRINCIPAL",
+    "SITUACAO",
+    "DATA DA SITUACAO",
+    "MOTIVO",
+    "SITUACAO ESPECIAL",
+    "DATA SITUACAO ESPECIAL",
+    "CONTRIBUINTE ICMS",
+    "PORTE",
+    "REGIME TRIBUTARIO",
+    "DATA DE ABERTURA",
+    "LOGRADOURO",
+    "NUMERO",
+    "COMPLEMENTO",
+    "BAIRRO",
+    "MUNICIPIO",
+    "UF",
+    "CEP",
+    "TELEFONE",
+    "E-MAIL",
+    "INSCRICOES ESTADUAIS"
+  ];
+
+  let cnpjsLote = [];
+  let resultadosLote = [];
+  let processandoLote = false;
+  let solicitarParada = false;
+
+  const cnpjManualInput = document.getElementById("cnpjManual");
+  const arquivoExcelInput = document.getElementById("arquivoExcel");
+  const btnEscolherArquivo = document.getElementById("btnEscolherArquivo");
+  const nomeArquivo = document.getElementById("nomeArquivo");
+  const btnConsultarManual = document.getElementById("btnConsultarManual");
+  const btnIniciarLote = document.getElementById("btnIniciarLote");
+  const btnPararLote = document.getElementById("btnPararLote");
+  const btnExportar = document.getElementById("btnExportar");
+  const statusManual = document.getElementById("statusManual");
+  const statusLote = document.getElementById("statusLote");
+  const resultadoManual = document.getElementById("resultadoManual");
+  const barraProgresso = document.getElementById("barraProgresso");
+  const pillQuantidade = document.getElementById("pillQuantidade");
+
+  function limparCNPJ(cnpj) {
+    return String(cnpj || "").replace(/\D/g, "");
+  }
+
+  function mascaraCNPJ(cnpjSomenteDigitos) {
+    let v = limparCNPJ(cnpjSomenteDigitos);
+    v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+    v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+    v = v.replace(/\.(\d{3})(\d)/, ".$1/$2");
+    v = v.replace(/(\d{4})(\d)/, "$1-$2");
+    return v.slice(0, 18);
+  }
+
+  function upper(v) {
+    if (v === null || v === undefined || String(v).trim() === "") return "NAO INFORMADO";
+    return String(v)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/ç/g, "c")
+      .replace(/Ç/g, "C")
+      .toUpperCase();
+  }
+
+  function formatarData(data) {
+    if (!data) return "NAO INFORMADO";
+    const valor = String(data).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+      const partes = valor.split("-");
+      return partes[2] + "." + partes[1] + "." + partes[0];
+    }
+    return upper(valor);
+  }
+
+  function formatarCEP(cep) {
+    if (!cep) return "NAO INFORMADO";
+    const v = String(cep).replace(/\D/g, "");
+    return v.length === 8 ? v.slice(0, 5) + "-" + v.slice(5) : upper(cep);
+  }
+
+  function regimeTributario(dadosBrasilApi) {
+    if (dadosBrasilApi && dadosBrasilApi.opcao_pelo_mei) return "MEI";
+    if (dadosBrasilApi && dadosBrasilApi.opcao_pelo_simples) return "SIMPLES NACIONAL";
+    return "REGIME NORMAL";
+  }
+
+  function textoInscricoesEstaduais(inscricoes) {
+    if (!Array.isArray(inscricoes) || inscricoes.length === 0) return "NAO POSSUI";
+    return inscricoes.map(function (ie) {
+      const uf = upper(ie && ie.estado ? ie.estado.sigla : "");
+      const numero = upper(ie ? ie.inscricao_estadual : "");
+      const ativo = ie && ie.ativo ? "ATIVA" : "INATIVA";
+      return uf + ": " + numero + " (" + ativo + ")";
+    }).join(" | ");
+  }
+
+  function montarLinhaResultado(cnpj, b, w) {
+    const inscricoes = (w && w.estabelecimento && Array.isArray(w.estabelecimento.inscricoes_estaduais))
+      ? w.estabelecimento.inscricoes_estaduais
+      : [];
+    const contribuinteICMS = inscricoes.some(function (ie) { return ie && ie.ativo; }) ? "SIM" : "NAO";
+    const emailWs = w && w.estabelecimento ? w.estabelecimento.email : "";
+
+    return {
+      "STATUS": "SUCESSO",
+      "ERRO": "",
+      "CNPJ": upper(b.cnpj || cnpj),
+      "RAZAO SOCIAL": upper(b.razao_social),
+      "NOME FANTASIA": upper(b.nome_fantasia),
+      "MATRIZ / FILIAL": upper(b.descricao_identificador_matriz_filial),
+      "NATUREZA JURIDICA": upper((b.codigo_natureza_juridica || "") + " - " + (b.natureza_juridica || "")),
+      "CNAE PRINCIPAL": upper((b.cnae_fiscal || "") + " - " + (b.cnae_fiscal_descricao || "")),
+      "SITUACAO": upper(b.descricao_situacao_cadastral),
+      "DATA DA SITUACAO": formatarData(b.data_situacao_cadastral),
+      "MOTIVO": upper(b.motivo_situacao_cadastral),
+      "SITUACAO ESPECIAL": upper(b.situacao_especial),
+      "DATA SITUACAO ESPECIAL": formatarData(b.data_situacao_especial),
+      "CONTRIBUINTE ICMS": contribuinteICMS,
+      "PORTE": upper(b.porte),
+      "REGIME TRIBUTARIO": regimeTributario(b),
+      "DATA DE ABERTURA": formatarData(b.data_inicio_atividade),
+      "LOGRADOURO": upper(b.logradouro),
+      "NUMERO": upper(b.numero),
+      "COMPLEMENTO": upper(b.complemento),
+      "BAIRRO": upper(b.bairro),
+      "MUNICIPIO": upper(b.municipio),
+      "UF": upper(b.uf),
+      "CEP": formatarCEP(b.cep),
+      "TELEFONE": upper(b.ddd_telefone_1),
+      "E-MAIL": upper(emailWs || b.email),
+      "INSCRICOES ESTADUAIS": textoInscricoesEstaduais(inscricoes)
+    };
+  }
+
+  function montarLinhaErro(cnpj, erro) {
+    const linha = {};
+    COLUNAS.forEach(function (coluna) { linha[coluna] = "NAO INFORMADO"; });
+    linha.STATUS = "ERRO";
+    linha.ERRO = upper(erro || "ERRO AO CONSULTAR O CNPJ");
+    linha.CNPJ = upper(cnpj);
+    return linha;
+  }
+
+  async function consultarNasApis(cnpj) {
+    const [resBrasil, resWs] = await Promise.allSettled([
+      fetch("https://brasilapi.com.br/api/cnpj/v1/" + cnpj),
+      fetch("https://publica.cnpj.ws/cnpj/" + cnpj)
+    ]);
+
+    if (resBrasil.status !== "fulfilled" || !resBrasil.value.ok) {
+      throw new Error("Falha na BrasilAPI");
+    }
+
+    const b = await resBrasil.value.json();
+    if (b && b.message) {
+      throw new Error(b.message);
+    }
+
+    let w = null;
+    if (resWs.status === "fulfilled" && resWs.value.ok) {
+      try {
+        w = await resWs.value.json();
+      } catch (e) {
+        w = null;
+      }
+    }
+    return { b: b, w: w };
+  }
+
+  function montarCardsConsultaIndividual(linha) {
+    const seoes = [
+      {
+        titulo: "Identificacao",
+        campos: ["CNPJ", "RAZAO SOCIAL", "NOME FANTASIA", "MATRIZ / FILIAL", "NATUREZA JURIDICA", "CNAE PRINCIPAL"]
+      },
+      {
+        titulo: "Situacao e Regime",
+        campos: ["SITUACAO", "DATA DA SITUACAO", "MOTIVO", "SITUACAO ESPECIAL", "DATA SITUACAO ESPECIAL", "PORTE", "REGIME TRIBUTARIO", "CONTRIBUINTE ICMS", "DATA DE ABERTURA"]
+      },
+      {
+        titulo: "Endereco e Contato",
+        campos: ["LOGRADOURO", "NUMERO", "COMPLEMENTO", "BAIRRO", "MUNICIPIO", "UF", "CEP", "TELEFONE", "E-MAIL", "INSCRICOES ESTADUAIS"]
+      }
+    ];
+
+    const classeBadge = linha.STATUS === "SUCESSO" ? "ok" : "err";
+    const classeErro = linha.ERRO && linha.ERRO !== "NAO INFORMADO" ? "err" : "ok";
+    const blocoTopo =
+      "<div class='result-top'>" +
+        "<h3>Resultado da consulta</h3>" +
+        "<p>" + (linha["RAZAO SOCIAL"] || "NAO INFORMADO") + "</p>" +
+        "<div class='result-badges'>" +
+          "<span class='badge " + classeBadge + "'>STATUS: " + (linha.STATUS || "NAO INFORMADO") + "</span>" +
+          "<span class='badge " + classeErro + "'>ERRO: " + (linha.ERRO || "NAO INFORMADO") + "</span>" +
+        "</div>" +
+      "</div>";
+
+    const blocos = seoes.map(function (secao) {
+      const cards = secao.campos.map(function (campo) {
+        return "<div class='field'><strong>" + campo + "</strong>" + (linha[campo] || "NAO INFORMADO") + "</div>";
+      }).join("");
+      return "<section class='result-section'><h4>" + secao.titulo + "</h4><div class='result-grid'>" + cards + "</div></section>";
+    }).join("");
+
+    resultadoManual.innerHTML = blocoTopo + blocos;
+  }
+
+  function atualizarProgresso(processados, total) {
+    const percentual = total > 0 ? Math.round((processados / total) * 100) : 0;
+    barraProgresso.style.width = percentual + "%";
+  }
+
+  function aguardar(ms) {
+    return new Promise(function (resolve) { setTimeout(resolve, ms); });
+  }
+
+  function atualizarBotoes() {
+    btnIniciarLote.disabled = processandoLote || cnpjsLote.length === 0;
+    btnPararLote.disabled = !processandoLote;
+    btnConsultarManual.disabled = processandoLote;
+    btnExportar.disabled = resultadosLote.length === 0;
+    btnEscolherArquivo.disabled = processandoLote;
+  }
+
+  function extrairCnpjsDoWorkbook(workbook) {
+    const primeiraAba = workbook.Sheets[workbook.SheetNames[0]];
+    const matriz = XLSX.utils.sheet_to_json(primeiraAba, { header: 1, defval: "" });
+    if (!matriz.length) return [];
+
+    const primeiraLinha = matriz[0].map(function (v) { return String(v).toLowerCase().trim(); });
+    const indiceCnpj = primeiraLinha.findIndex(function (h) { return h.includes("cnpj"); });
+    const candidatos = [];
+
+    if (indiceCnpj >= 0) {
+      for (let i = 1; i < matriz.length; i++) {
+        candidatos.push(matriz[i][indiceCnpj]);
+      }
+    } else {
+      matriz.forEach(function (linha) {
+        linha.forEach(function (celula) {
+          candidatos.push(celula);
+        });
+      });
+    }
+
+    const unicos = [];
+    const vistos = new Set();
+    candidatos.forEach(function (item) {
+      const cnpj = limparCNPJ(item);
+      if (cnpj.length === 14 && !vistos.has(cnpj)) {
+        vistos.add(cnpj);
+        unicos.push(cnpj);
+      }
+    });
+    return unicos;
+  }
+
+  async function consultarManual() {
+    const cnpj = limparCNPJ(cnpjManualInput.value);
+    if (cnpj.length !== 14) {
+      statusManual.innerHTML = "<span class='warn'>Informe um CNPJ valido com 14 digitos.</span>";
+      return;
+    }
+
+    statusManual.textContent = "Consultando...";
+    resultadoManual.innerHTML = "";
+    try {
+      const dados = await consultarNasApis(cnpj);
+      const linha = montarLinhaResultado(cnpj, dados.b, dados.w);
+      montarCardsConsultaIndividual(linha);
+      statusManual.innerHTML = "<span class='ok'>Consulta concluida com sucesso.</span>";
+    } catch (e) {
+      const linhaErro = montarLinhaErro(cnpj, e && e.message ? e.message : "Erro inesperado");
+      montarCardsConsultaIndividual(linhaErro);
+      statusManual.innerHTML = "<span class='err'>Nao foi possivel concluir a consulta.</span>";
+    }
+  }
+
+  async function iniciarProcessamentoLote() {
+    if (processandoLote || cnpjsLote.length === 0) return;
+
+    processandoLote = true;
+    solicitarParada = false;
+    resultadosLote = [];
+    atualizarProgresso(0, cnpjsLote.length);
+    atualizarBotoes();
+
+    for (let i = 0; i < cnpjsLote.length; i++) {
+      if (solicitarParada) {
+        statusLote.innerHTML = "<span class='warn'>Processamento interrompido pelo usuario.</span>";
+        break;
+      }
+
+      const cnpj = cnpjsLote[i];
+      statusLote.textContent = "Consultando " + (i + 1) + " de " + cnpjsLote.length + " (CNPJ " + mascaraCNPJ(cnpj) + ")...";
+
+      let linha;
+      try {
+        const dados = await consultarNasApis(cnpj);
+        linha = montarLinhaResultado(cnpj, dados.b, dados.w);
+      } catch (e) {
+        linha = montarLinhaErro(cnpj, e && e.message ? e.message : "Erro inesperado");
+      }
+
+      resultadosLote.push(linha);
+      atualizarProgresso(i + 1, cnpjsLote.length);
+      atualizarBotoes();
+
+      if (i < cnpjsLote.length - 1 && !solicitarParada) {
+        statusLote.textContent = "Aguardando 20 segundos para a proxima consulta...";
+        await aguardar(INTERVALO_CONSULTA_MS);
+      }
+    }
+
+    processandoLote = false;
+    atualizarBotoes();
+    if (!solicitarParada) {
+      statusLote.innerHTML = "<span class='ok'>Processamento finalizado. Voce ja pode exportar o XLSX.</span>";
+    }
+  }
+
+  function exportarResultadosXlsx() {
+    if (!resultadosLote.length) return;
+    const ws = XLSX.utils.json_to_sheet(resultadosLote, { header: COLUNAS });
+    ws["!cols"] = COLUNAS.map(function (coluna) {
+      const maxTexto = Math.max(coluna.length, 14);
+      return { wch: Math.min(maxTexto + 4, 45) };
+    });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "CONSULTAS_CNPJ");
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    XLSX.writeFile(wb, "resultado_consulta_cnpj_" + stamp + ".xlsx");
+  }
+
+  cnpjManualInput.addEventListener("input", function () {
+    this.value = mascaraCNPJ(this.value);
+  });
+
+  btnEscolherArquivo.addEventListener("click", function () {
+    arquivoExcelInput.click();
+  });
+
+  arquivoExcelInput.addEventListener("change", async function (event) {
+    const arquivo = event.target.files && event.target.files[0];
+    if (!arquivo) {
+      nomeArquivo.textContent = "Nenhum arquivo selecionado";
+      return;
+    }
+
+    nomeArquivo.textContent = arquivo.name;
+    statusLote.textContent = "Lendo arquivo...";
+    try {
+      const buffer = await arquivo.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: "array" });
+      cnpjsLote = extrairCnpjsDoWorkbook(workbook);
+      pillQuantidade.textContent = "CNPJs carregados: " + cnpjsLote.length;
+      statusLote.innerHTML = cnpjsLote.length
+        ? "<span class='ok'>Arquivo carregado. Clique em Iniciar lote.</span>"
+        : "<span class='warn'>Nenhum CNPJ valido encontrado no arquivo.</span>";
+      atualizarBotoes();
+      atualizarProgresso(0, cnpjsLote.length);
+    } catch (e) {
+      cnpjsLote = [];
+      nomeArquivo.textContent = "Nenhum arquivo selecionado";
+      pillQuantidade.textContent = "CNPJs carregados: 0";
+      statusLote.innerHTML = "<span class='err'>Falha ao ler o arquivo. Verifique o formato.</span>";
+      atualizarBotoes();
+      atualizarProgresso(0, 0);
+    }
+  });
+
+  btnConsultarManual.addEventListener("click", consultarManual);
+  btnIniciarLote.addEventListener("click", iniciarProcessamentoLote);
+  btnPararLote.addEventListener("click", function () {
+    solicitarParada = true;
+    statusLote.innerHTML = "<span class='warn'>Parada solicitada. Aguarde a consulta atual terminar.</span>";
+  });
+  btnExportar.addEventListener("click", exportarResultadosXlsx);
+
+  resultadoManual.innerHTML = "<div class='result-top'><h3>Consulta individual</h3><p>Informe um CNPJ e clique em Consultar CNPJ para visualizar o painel completo.</p></div>";
+  atualizarBotoes();
+</script>
+</body>
+</html>
