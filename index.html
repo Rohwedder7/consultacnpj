@@ -514,6 +514,12 @@
     return v.length === 8 ? v.slice(0, 5) + "-" + v.slice(5) : upper(cep);
   }
 
+  function formatarCNAE(cnae) {
+    if (!cnae) return "NAO INFORMADO";
+    const v = String(cnae).replace(/\D/g, "");
+    return v.padStart(7, "0");
+  }
+
   function regimeTributario(dadosBrasilApi) {
     if (dadosBrasilApi && dadosBrasilApi.opcao_pelo_mei) return "MEI";
     if (dadosBrasilApi && dadosBrasilApi.opcao_pelo_simples) return "SIMPLES NACIONAL";
@@ -545,7 +551,7 @@
       "NOME FANTASIA": upper(b.nome_fantasia),
       "MATRIZ / FILIAL": upper(b.descricao_identificador_matriz_filial),
       "NATUREZA JURIDICA": upper((b.codigo_natureza_juridica || "") + " - " + (b.natureza_juridica || "")),
-      "CNAE PRINCIPAL": upper((b.cnae_fiscal || "") + " - " + (b.cnae_fiscal_descricao || "")),
+      "CNAE PRINCIPAL": upper(formatarCNAE(b.cnae_fiscal) + " - " + (b.cnae_fiscal_descricao || "")),
       "SITUACAO": upper(b.descricao_situacao_cadastral),
       "DATA DA SITUACAO": formatarData(b.data_situacao_cadastral),
       "MOTIVO": upper(b.motivo_situacao_cadastral),
