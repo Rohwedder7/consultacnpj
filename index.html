@@ -3,186 +3,377 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Consulta Publica de CNPJ</title>
+<title>Consulta Pública de CNPJ - GDM Seeds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..900;1,14..32,300..900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f7fb;
-    --card: #ffffff;
-    --text: #1f2937;
-    --muted: #6b7280;
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
-    --border: #e5e7eb;
-    --success: #059669;
-    --warning: #d97706;
-    --error: #dc2626;
+    /* === PALETA OFICIAL GDM === */
+    --color-primary: #092A3B;          /* Pantone 540 C */
+    --color-secondary: #003DA6;        /* Pantone 7691 C */
+    --color-accent-warm: #B67F5A;      /* Pantone 722 C */
+    --color-accent-lime: #B4BD00;      /* Pantone 390 C */
+    --color-black: #000000;            /* Preto */
+    --color-gray: #898A8D;             /* Cool Gray 8 C */
+    --color-light-gray: #D0D0D0;       /* 25% Black C */
+    --color-white: #FFFFFF;            /* Branco */
+    
+    /* === TOKENS DE SISTEMA === */
+    --bg-primary: #FAFBFC;
+    --bg-card: var(--color-white);
+    --text-primary: var(--color-black);
+    --text-secondary: var(--color-gray);
+    --text-muted: #6B7280;
+    --border-light: var(--color-light-gray);
+    --border-medium: #C4C6C9;
+    
+    /* === STATUS COLORS === */
+    --status-success: #10B981;
+    --status-warning: #F59E0B;
+    --status-error: #EF4444;
+    --status-success-bg: #ECFDF5;
+    --status-warning-bg: #FFFBEB;
+    --status-error-bg: #FEF2F2;
+    
+    /* === SPACING TOKENS === */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-xxl: 48px;
+    
+    /* === BORDER RADIUS === */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-full: 9999px;
+    
+    /* === SHADOWS === */
+    --shadow-sm: 0 1px 2px 0 rgba(9, 42, 59, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(9, 42, 59, 0.1), 0 2px 4px -1px rgba(9, 42, 59, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(9, 42, 59, 0.1), 0 4px 6px -2px rgba(9, 42, 59, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(9, 42, 59, 0.1), 0 10px 10px -5px rgba(9, 42, 59, 0.04);
+    
+    /* === TRANSITIONS === */
+    --transition-base: 0.2s ease-in-out;
+    --transition-fast: 0.15s ease-in-out;
+    
+    /* === LAYOUT === */
+    --header-height: 80px;
+    --container-max-width: 1440px;
+    --content-padding: var(--space-lg);
   }
 
-  * { box-sizing: border-box; }
+  /* === RESET & BASE === */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
   html, body {
     width: 100%;
     max-width: 100%;
-    overflow-x: clip;
+    overflow-x: hidden;
   }
 
   body {
-    margin: 0;
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: linear-gradient(180deg, #eef3ff 0%, var(--bg) 35%, var(--bg) 100%);
-    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #F8FAFC 0%, var(--bg-primary) 100%);
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
+  /* === HEADER CORPORATIVO === */
+  .header {
+    background: linear-gradient(135deg, var(--color-primary) 0%, #0A2E42 100%);
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--content-padding);
+    box-shadow: var(--shadow-lg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .logo {
+    height: 48px;
+    width: auto;
+    filter: brightness(0) invert(1);
+    transition: var(--transition-base);
+  }
+
+  .logo:hover {
+    transform: scale(1.02);
+  }
+
+  .brand-text {
+    color: var(--color-white);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .brand-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.875rem;
+    font-weight: 400;
+    margin-top: -2px;
+  }
+
+  /* === LAYOUT PRINCIPAL === */
   .app {
     width: 100%;
-    max-width: 1600px;
-    padding: 0 12px;
-    margin: 12px auto 24px;
+    max-width: var(--container-max-width);
+    padding: var(--space-xl) var(--content-padding);
+    margin: 0 auto;
     display: grid;
-    gap: 16px;
+    gap: var(--space-xl);
   }
 
-  .app,
-  .hero,
-  .card,
-  .controls-grid,
-  .input-group,
-  .meta,
-  .result-shell {
-    min-width: 0;
-  }
-
+  /* === HERO SECTION === */
   .hero {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 18px;
-    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.08);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xxl) var(--space-xl);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-accent-lime) 100%);
   }
 
   .hero h1 {
-    margin: 0 0 8px;
-    font-size: clamp(1.4rem, 3vw, 2rem);
-    letter-spacing: 0.2px;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    color: var(--color-primary);
+    margin-bottom: var(--space-md);
+    letter-spacing: -0.03em;
   }
 
   .hero p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.96rem;
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+    max-width: 720px;
+    margin: 0 auto;
+    font-weight: 400;
   }
 
+  /* === GRID DE CONTROLES === */
   .controls-grid {
     display: grid;
-    gap: 16px;
+    gap: var(--space-xl);
     grid-template-columns: 1fr;
-    align-items: stretch;
   }
 
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 16px;
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
-  }
-
-  .card.half {
-    min-width: 0;
-  }
-
-  @media (min-width: 1280px) {
+  @media (min-width: 1024px) {
     .controls-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 
-  h2 {
-    margin: 0 0 12px;
-    font-size: 1.05rem;
+  /* === CARDS === */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-base);
+    position: relative;
   }
 
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .card h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .card h2::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: var(--color-secondary);
+    border-radius: var(--radius-full);
+  }
+
+  /* === FORMULÁRIOS === */
   .input-group {
     display: grid;
-    gap: 10px;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
   }
 
   label {
     display: block;
     font-weight: 600;
-    font-size: 0.9rem;
-    color: #111827;
+    font-size: 0.875rem;
+    color: var(--color-primary);
+    margin-bottom: var(--space-xs);
   }
 
-  input[type="text"], input[type="file"] {
-    display: block;
+  input[type="text"],
+  input[type="file"] {
     width: 100%;
-    min-width: 0;
-    max-width: 100%;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 11px 12px;
-    background: #fff;
-    color: var(--text);
-    font-size: 0.94rem;
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 14px var(--space-md);
+    background: var(--color-white);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 400;
+    transition: var(--transition-base);
+    font-family: inherit;
   }
 
+  input[type="text"]:focus,
+  input[type="file"]:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 3px rgba(0, 61, 166, 0.1);
+  }
+
+  input[type="text"]:hover {
+    border-color: var(--border-medium);
+  }
+
+  /* === BOTÕES === */
   .btn-row {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    margin-top: 4px;
-    width: 100%;
+    gap: var(--space-sm);
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    margin-top: var(--space-lg);
   }
-
-  .btn-row > * { min-width: 0; max-width: 100%; }
-  .btn-row > :only-child { grid-column: 1 / -1; }
 
   button {
-    width: 100%;
-    min-height: 42px;
+    padding: 14px var(--space-lg);
     border: none;
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 0.92rem;
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
     font-weight: 600;
     cursor: pointer;
-    transition: 0.2s ease;
+    transition: var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    min-height: 48px;
+    font-family: inherit;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
   }
 
-  .btn-primary { background: var(--primary); color: #fff; }
-  .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
-  .btn-neutral { background: #e5e7eb; color: #111827; }
-  .btn-neutral:hover:not(:disabled) { background: #d1d5db; }
-  .btn-danger { background: #fee2e2; color: #991b1b; }
-  .btn-danger:hover:not(:disabled) { background: #fecaca; }
-  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  /* === VARIANTES DE BOTÕES === */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: var(--color-white);
+    box-shadow: var(--shadow-sm);
+  }
 
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .btn-neutral {
+    background: var(--color-white);
+    color: var(--color-primary);
+    border: 2px solid var(--border-light);
+  }
+
+  .btn-neutral:hover:not(:disabled) {
+    border-color: var(--color-secondary);
+    background: #F8FAFC;
+  }
+
+  .btn-danger {
+    background: var(--status-error-bg);
+    color: var(--status-error);
+    border: 2px solid #FCA5A5;
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    background: var(--status-error);
+    color: var(--color-white);
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  /* === META INFORMAÇÕES === */
   .meta {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    margin-top: 12px;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .meta {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   .pill {
-    display: block;
-    background: #f9fafb;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 6px 10px;
-    font-size: 0.8rem;
-    color: #374151;
+    background: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-full);
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-secondary);
     text-align: center;
-    overflow-wrap: anywhere;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
   }
 
+  /* === SELETOR DE ARQUIVO === */
   .file-picker {
-    width: 100%;
-    min-width: 0;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 8px;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-md);
     align-items: center;
   }
 
@@ -195,220 +386,417 @@
   }
 
   .file-name {
-    width: 100%;
-    min-width: 0;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 12px;
-    background: #fff;
-    font-size: 0.9rem;
-    color: #4b5563;
+    padding: 14px var(--space-md);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-md);
+    background: var(--color-white);
+    font-size: 0.9375rem;
+    color: var(--text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
   }
 
+  /* === STATUS E FEEDBACK === */
   .status {
-    margin-top: 10px;
-    font-size: 0.9rem;
-    color: #1f2937;
-    min-height: 20px;
+    margin-top: var(--space-lg);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
   }
 
   .progress-wrap {
-    margin-top: 10px;
+    margin-top: var(--space-lg);
     width: 100%;
-    background: #e5e7eb;
-    border-radius: 999px;
-    height: 10px;
+    background: var(--color-light-gray);
+    border-radius: var(--radius-full);
+    height: 12px;
     overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
   }
 
   .progress-bar {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #60a5fa, #2563eb);
-    transition: width 0.4s ease;
+    background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-accent-lime) 100%);
+    transition: width 0.3s ease;
+    border-radius: var(--radius-full);
   }
 
+  /* === CLASSES DE STATUS === */
+  .ok {
+    color: var(--status-success);
+    font-weight: 600;
+  }
+
+  .warn {
+    color: var(--status-warning);
+    font-weight: 600;
+  }
+
+  .err {
+    color: var(--status-error);
+    font-weight: 600;
+  }
+  /* === RESULTADOS === */
   .result-shell {
     display: grid;
-    gap: 14px;
+    gap: var(--space-xl);
   }
 
   .result-top {
-    border: 1px solid #dbeafe;
-    background: linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
-    border-radius: 12px;
-    padding: 14px;
+    background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+    border: 1px solid #BAE6FD;
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
     display: grid;
-    gap: 8px;
+    gap: var(--space-md);
+    position: relative;
+  }
+
+  .result-top::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-accent-lime) 100%);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   }
 
   .result-top h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
     margin: 0;
-    font-size: 1.03rem;
   }
 
   .result-top p {
+    color: var(--text-secondary);
+    font-size: 1rem;
     margin: 0;
-    color: #334155;
-    font-size: 0.92rem;
     overflow-wrap: anywhere;
   }
 
   .result-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--space-sm);
   }
 
   .badge {
-    border-radius: 999px;
-    padding: 5px 10px;
-    font-size: 0.78rem;
+    border-radius: var(--radius-full);
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.2px;
-    border: 1px solid transparent;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
   }
 
   .badge.ok {
-    color: #065f46;
-    background: #d1fae5;
-    border-color: #a7f3d0;
+    background: var(--status-success-bg);
+    color: var(--status-success);
+    border: 1px solid #A7F3D0;
   }
 
   .badge.err {
-    color: #991b1b;
-    background: #fee2e2;
-    border-color: #fecaca;
+    background: var(--status-error-bg);
+    color: var(--status-error);
+    border: 1px solid #FECACA;
   }
 
   .result-section {
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px;
-    background: #ffffff;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-sm);
   }
 
   .result-section h4 {
-    margin: 0 0 10px;
-    font-size: 0.95rem;
-    color: #0f172a;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0 0 var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .result-section h4::before {
+    content: '';
+    width: 3px;
+    height: 20px;
+    background: var(--color-accent-warm);
+    border-radius: var(--radius-full);
   }
 
   .result-grid {
     display: grid;
-    gap: 10px;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: var(--space-md);
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
 
   .field {
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px;
-    background: #f8fafc;
+    background: #F8FAFC;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    transition: var(--transition-base);
+  }
+
+  .field:hover {
+    background: #F1F5F9;
+    border-color: var(--border-medium);
   }
 
   .field strong {
     display: block;
-    font-size: 0.76rem;
-    color: #6b7280;
-    margin-bottom: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-xs);
   }
 
-  .ok { color: var(--success); font-weight: 600; }
-  .warn { color: var(--warning); font-weight: 600; }
-  .err { color: var(--error); font-weight: 600; }
+  .field span {
+    color: var(--text-primary);
+    font-weight: 500;
+    word-break: break-word;
+  }
 
-  @media (max-width: 760px) {
-    body {
-      font-size: 16px;
+  /* === RESPONSIVIDADE === */
+  @media (max-width: 1023px) {
+    .header {
+      padding: 0 var(--space-md);
+    }
+
+    .brand-text {
+      font-size: 1.25rem;
     }
 
     .app {
-      width: 100%;
-      max-width: 100%;
-      padding: 0 6px;
-      gap: 12px;
-      margin: 6px auto 14px;
+      padding: var(--space-lg) var(--space-md);
+      gap: var(--space-lg);
     }
 
-    .hero,
+    .hero {
+      padding: var(--space-xl) var(--space-lg);
+    }
+
     .card {
-      padding: 12px;
-      border-radius: 12px;
+      padding: var(--space-lg);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .header {
+      height: 70px;
     }
 
-    .controls-grid {
-      grid-template-columns: 1fr;
+    .logo {
+      height: 40px;
+    }
+
+    .brand-text {
+      font-size: 1.125rem;
+    }
+
+    .brand-subtitle {
+      display: none;
+    }
+
+    .hero h1 {
+      font-size: 1.75rem;
+    }
+
+    .hero p {
+      font-size: 1rem;
     }
 
     .btn-row {
       grid-template-columns: 1fr;
-    }
-
-    button {
-      width: 100%;
+      gap: var(--space-sm);
     }
 
     .meta {
       grid-template-columns: 1fr;
     }
 
-    .pill {
-      width: 100%;
-      text-align: center;
-    }
-
     .file-picker {
       grid-template-columns: 1fr;
+      gap: var(--space-sm);
     }
 
     .result-grid {
       grid-template-columns: 1fr;
     }
+
+    .result-badges {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .app {
+      padding: var(--space-md) var(--space-sm);
+    }
+
+    .hero {
+      padding: var(--space-lg) var(--space-md);
+    }
+
+    .card {
+      padding: var(--space-md);
+    }
+
+    input[type="text"],
+    input[type="file"],
+    .file-name {
+      padding: 12px var(--space-sm);
+    }
+
+    button {
+      padding: 12px var(--space-md);
+      font-size: 0.875rem;
+    }
+  }
+
+  /* === ANIMAÇÕES E MICRO-INTERAÇÕES === */
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .card,
+  .result-section {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  /* === ESTADOS DE FOCO E ACESSIBILIDADE === */
+  button:focus-visible,
+  input:focus-visible {
+    outline: 2px solid var(--color-secondary);
+    outline-offset: 2px;
+  }
+
+  /* === SCROLLBAR PERSONALIZADA === */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-light-gray);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-gray);
+    border-radius: var(--radius-full);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary);
+  }
+
+  /* === PRINT STYLES === */
+  @media print {
+    .header,
+    .btn-row,
+    button {
+      display: none !important;
+    }
+
+    .card,
+    .result-section {
+      box-shadow: none !important;
+      border: 1px solid #000 !important;
+      page-break-inside: avoid;
+    }
   }
 </style>
 </head>
 <body>
+<!-- === HEADER CORPORATIVO === -->
+<header class="header">
+  <div class="header-brand">
+    <!-- Logo removido por solicitação -->
+    <div>
+      <div class="brand-text">GDM Seeds</div>
+      <div class="brand-subtitle">Sistema de Consulta Empresarial - V. 1.01</div>
+    </div>
+  </div>
+</header>
+
+<!-- === APLICAÇÃO PRINCIPAL === -->
 <div class="app">
+  <!-- === HERO SECTION === -->
   <section class="hero">
-    <h1>Consulta Publica de CNPJ em Lote</h1>
-    <p>Importe um arquivo Excel com CNPJs, consulte as APIs em 3 requisicoes por minuto e exporte o resultado em XLSX com os mesmos campos do cadastro.</p>
+    <h1>Consulta Pública de CNPJ em Lote</h1>
+    <p>Importe um arquivo Excel com CNPJs, consulte as APIs governamentais com controle de taxa (3 requisições por minuto) e exporte o resultado completo em formato XLSX com todos os campos do cadastro empresarial.</p>
   </section>
 
+  <!-- === GRID DE CONTROLES === -->
   <section class="controls-grid">
-    <article class="card half">
-      <h2>Consulta individual</h2>
+    <!-- === CONSULTA INDIVIDUAL === -->
+    <article class="card">
+      <h2>Consulta Individual</h2>
       <div class="input-group">
-        <label for="cnpjManual">CNPJ</label>
+        <label for="cnpjManual">CNPJ da Empresa</label>
         <input id="cnpjManual" type="text" placeholder="00.000.000/0000-00" maxlength="18">
       </div>
       <div class="btn-row">
-        <button id="btnConsultarManual" class="btn-primary" type="button">Consultar CNPJ</button>
+        <button id="btnConsultarManual" class="btn-primary" type="button">
+          Consultar CNPJ
+        </button>
       </div>
       <div id="statusManual" class="status"></div>
     </article>
 
-    <article class="card half">
-      <h2>Processamento em lote (Excel)</h2>
+    <!-- === PROCESSAMENTO EM LOTE === -->
+    <article class="card">
+      <h2>Processamento em Lote</h2>
       <div class="input-group">
-        <label for="arquivoExcel">Arquivo (xlsx, xls ou csv)</label>
+        <label for="arquivoExcel">Arquivo Excel, XLS ou CSV</label>
         <div class="file-picker">
           <input id="arquivoExcel" class="file-native" type="file" accept=".xlsx,.xls,.csv">
-          <button id="btnEscolherArquivo" class="btn-neutral" type="button">Escolher arquivo</button>
+          <button id="btnEscolherArquivo" class="btn-neutral" type="button">
+            Escolher Arquivo
+          </button>
           <div id="nomeArquivo" class="file-name">Nenhum arquivo selecionado</div>
         </div>
       </div>
       <div class="btn-row">
-        <button id="btnIniciarLote" class="btn-primary" type="button" disabled>Iniciar lote</button>
-        <button id="btnPararLote" class="btn-danger" type="button" disabled>Parar</button>
-        <button id="btnExportar" class="btn-neutral" type="button" disabled>Exportar XLSX</button>
+        <button id="btnIniciarLote" class="btn-primary" type="button" disabled>
+          Iniciar Processamento
+        </button>
+        <button id="btnPararLote" class="btn-danger" type="button" disabled>
+          Parar Processo
+        </button>
+        <button id="btnExportar" class="btn-neutral" type="button" disabled>
+          Exportar XLSX
+        </button>
       </div>
       <div class="meta">
-        <span class="pill" id="pillIntervalo">Intervalo entre CNPJs: 20s (3 por minuto)</span>
-        <span class="pill" id="pillQuantidade">CNPJs carregados: 0</span>
+        <span class="pill" id="pillIntervalo">⏱️ Intervalo: 20s (3 por minuto)</span>
+        <span class="pill" id="pillQuantidade">📊 CNPJs carregados: 0</span>
       </div>
       <div id="statusLote" class="status"></div>
       <div class="progress-wrap">
@@ -417,8 +805,9 @@
     </article>
   </section>
 
+  <!-- === RESULTADOS === -->
   <section class="card">
-    <h2>Resultado da consulta individual</h2>
+    <h2>Resultado da Consulta Individual</h2>
     <div id="resultadoManual" class="result-shell"></div>
   </section>
 </div>
@@ -612,15 +1001,15 @@
   function montarCardsConsultaIndividual(linha) {
     const seoes = [
       {
-        titulo: "Identificacao",
+        titulo: "Identificação",
         campos: ["CNPJ", "RAZAO SOCIAL", "NOME FANTASIA", "MATRIZ / FILIAL", "NATUREZA JURIDICA", "CNAE PRINCIPAL"]
       },
       {
-        titulo: "Situacao e Regime",
+        titulo: "Situação e Regime",
         campos: ["SITUACAO", "DATA DA SITUACAO", "MOTIVO", "SITUACAO ESPECIAL", "DATA SITUACAO ESPECIAL", "PORTE", "REGIME TRIBUTARIO", "CONTRIBUINTE ICMS", "DATA DE ABERTURA"]
       },
       {
-        titulo: "Endereco e Contato",
+        titulo: "Endereço e Contato",
         campos: ["LOGRADOURO", "NUMERO", "COMPLEMENTO", "BAIRRO", "MUNICIPIO", "UF", "CEP", "TELEFONE", "E-MAIL", "INSCRICOES ESTADUAIS"]
       }
     ];
@@ -639,7 +1028,7 @@
 
     const blocos = seoes.map(function (secao) {
       const cards = secao.campos.map(function (campo) {
-        return "<div class='field'><strong>" + campo + "</strong>" + (linha[campo] || "NAO INFORMADO") + "</div>";
+        return "<div class='field'><strong>" + campo + "</strong><span>" + (linha[campo] || "NAO INFORMADO") + "</span></div>";
       }).join("");
       return "<section class='result-section'><h4>" + secao.titulo + "</h4><div class='result-grid'>" + cards + "</div></section>";
     }).join("");
@@ -796,16 +1185,16 @@
       const buffer = await arquivo.arrayBuffer();
       const workbook = XLSX.read(buffer, { type: "array" });
       cnpjsLote = extrairCnpjsDoWorkbook(workbook);
-      pillQuantidade.textContent = "CNPJs carregados: " + cnpjsLote.length;
+      pillQuantidade.textContent = "📊 CNPJs carregados: " + cnpjsLote.length;
       statusLote.innerHTML = cnpjsLote.length
-        ? "<span class='ok'>Arquivo carregado. Clique em Iniciar lote.</span>"
-        : "<span class='warn'>Nenhum CNPJ valido encontrado no arquivo.</span>";
+        ? "<span class='ok'>✅ Arquivo processado com sucesso. Clique em 'Iniciar Processamento' para começar.</span>"
+        : "<span class='warn'>⚠️ Nenhum CNPJ válido encontrado no arquivo. Verifique se o formato está correto.</span>";
       atualizarBotoes();
       atualizarProgresso(0, cnpjsLote.length);
     } catch (e) {
       cnpjsLote = [];
       nomeArquivo.textContent = "Nenhum arquivo selecionado";
-      pillQuantidade.textContent = "CNPJs carregados: 0";
+      pillQuantidade.textContent = "📊 CNPJs carregados: 0";
       statusLote.innerHTML = "<span class='err'>Falha ao ler o arquivo. Verifique o formato.</span>";
       atualizarBotoes();
       atualizarProgresso(0, 0);
@@ -820,7 +1209,7 @@
   });
   btnExportar.addEventListener("click", exportarResultadosXlsx);
 
-  resultadoManual.innerHTML = "<div class='result-top'><h3>Consulta individual</h3><p>Informe um CNPJ e clique em Consultar CNPJ para visualizar o painel completo.</p></div>";
+  resultadoManual.innerHTML = "<div class='result-top'><h3>Painel de Consulta Individual</h3><p>Informe um CNPJ válido no campo acima e clique em 'Consultar CNPJ' para visualizar os dados empresariais completos extraídos das bases governamentais.</p></div>";
   atualizarBotoes();
 </script>
 </body>
